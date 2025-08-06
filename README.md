@@ -8,11 +8,8 @@ ConnectX is a modern professional networking platform designed to connect profes
 
 - **User Authentication**: Secure JWT-based authentication system
 - **Profile Management**: Create and customize professional profiles
-- **Social Networking**: Connect with other professionals
 - **Content Sharing**: Create, like, comment on, and share posts
 - **Job Listings**: Browse and apply for job opportunities
-- **Real-time Notifications**: Stay updated with activities
-- **Messaging**: Communicate with connections
 - **Search Functionality**: Find users, posts, and jobs
   
 ## Demo Credentials
@@ -39,7 +36,7 @@ Use the following credentials to test the platform:
 - MongoDB with Mongoose ODM
 - JWT for authentication
 - Bcrypt for password hashing
-- Multer for file uploads
+- cloudinary for file uploads
 - Express Validator for request validation
 
 ## Installation
@@ -97,7 +94,6 @@ The API is organized into the following endpoints:
 - Get User Profile: `GET /api/users/:id`
 - Update User Profile: `PUT /api/users/:id`
 - Complete Profile: `POST /api/users/complete-profile`
-- Upload Avatar: `POST /api/users/upload-avatar`
 - Search Users: `GET /api/users/search`
 
 ### Posts
@@ -111,13 +107,6 @@ The API is organized into the following endpoints:
 - Add Comment to Post: `POST /api/posts/:id/comments`
 - Get Post Comments: `GET /api/posts/:id/comments`
 - Share Post: `POST /api/posts/:id/share`
-
-### Skills
-- Get All Skills: `GET /api/skills`
-- Get Skill by ID: `GET /api/skills/:id`
-- Add Skill to User Profile: `POST /api/skills/user`
-- Remove Skill from User Profile: `DELETE /api/skills/user/:id`
-- Get User Skills: `GET /api/skills/user/:userId`
 
 ## Project Structure
 
