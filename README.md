@@ -14,6 +14,14 @@ ConnectX is a modern professional networking platform designed to connect profes
 - **Real-time Notifications**: Stay updated with activities
 - **Messaging**: Communicate with connections
 - **Search Functionality**: Find users, posts, and jobs
+  
+##Demo Credentials
+Use the following credentials to test the platform:
+
+- Email: sukhvir@gmail.com
+- Password: karan@1234
+
+
 
 ## Tech Stack
 
@@ -138,7 +146,3 @@ The API is organized into the following endpoints:
     ├── uploads/        # Uploaded files
     └── README.md       # Backend documentation
 ```
-
-## License
-
-This project is licensed under the MIT License.
