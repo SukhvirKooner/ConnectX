@@ -5,9 +5,60 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Camera } from "lucide-react";
+import { Camera, RefreshCw } from "lucide-react";
+import { useState, useEffect } from "react";
+import { keepAliveService } from "@/services";
+import { useToast } from "@/hooks/use-toast";
 
 export default function SettingsPage() {
+  const { toast } = useToast();
+  const [keepAliveEnabled, setKeepAliveEnabled] = useState(false);
+  
+  // Check if keep-alive service is running on component mount
+  useEffect(() => {
+    // We can't directly check the interval, so we'll use localStorage to track state
+    const isEnabled = localStorage.getItem('keepAliveEnabled') === 'true';
+    setKeepAliveEnabled(isEnabled);
+  }, []);
+  
+  // Toggle keep-alive service
+  const handleKeepAliveToggle = (enabled: boolean) => {
+    setKeepAliveEnabled(enabled);
+    
+    if (enabled) {
+      keepAliveService.start();
+      localStorage.setItem('keepAliveEnabled', 'true');
+      toast({
+        title: "Keep-alive service started",
+        description: "The service will ping the server every 5 minutes to prevent it from sleeping.",
+      });
+    } else {
+      keepAliveService.stop();
+      localStorage.setItem('keepAliveEnabled', 'false');
+      toast({
+        title: "Keep-alive service stopped",
+        description: "The server may go to sleep after periods of inactivity.",
+      });
+    }
+  };
+  
+  // Manually trigger a ping
+  const handleManualPing = async () => {
+    try {
+      await keepAliveService.ping();
+      toast({
+        title: "Server pinged successfully",
+        description: "The server is awake and responding.",
+      });
+    } catch (error) {
+      toast({
+        title: "Failed to ping server",
+        description: "There was an error connecting to the server.",
+        variant: "destructive",
+      });
+    }
+  };
+  
   return (
     <div className="mx-auto max-w-2xl mt-8">
       <div className="space-y-6">
@@ -135,6 +186,43 @@ export default function SettingsPage() {
                 <p className="text-sm text-muted-foreground">Receive updates about new features</p>
               </div>
               <Switch />
+            </div>
+          </CardContent>
+        </Card>
+        
+        {/* Performance Settings */}
+        <Card className="shadow-card border border-border">
+          <CardHeader>
+            <CardTitle>Performance Settings</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-medium text-foreground">Keep-Alive Service</h3>
+                <p className="text-sm text-muted-foreground">Prevent the server from sleeping due to inactivity</p>
+              </div>
+              <Switch 
+                checked={keepAliveEnabled}
+                onCheckedChange={handleKeepAliveToggle}
+              />
+            </div>
+            
+            <Separator />
+            
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-medium text-foreground">Manual Server Ping</h3>
+                <p className="text-sm text-muted-foreground">Manually wake up the server</p>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleManualPing}
+                className="flex items-center gap-2"
+              >
+                <RefreshCw className="h-4 w-4" />
+                Ping Server
+              </Button>
             </div>
           </CardContent>
         </Card>

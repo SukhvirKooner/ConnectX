@@ -7,6 +7,7 @@ import connectionService from './connectionService';
 import searchService from './searchService';
 import jobService from './jobService';
 import notificationService from './notificationService';
+import keepAliveService from './keepAliveService';
 
 export {
   api,
@@ -18,4 +19,5 @@ export {
   searchService,
   jobService,
   notificationService,
+  keepAliveService,
 };
