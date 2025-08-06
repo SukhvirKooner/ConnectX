@@ -114,7 +114,7 @@ export default function ProfilePage() {
   // const joinDate = user?.createdAt ? format(new Date(user.createdAt), 'MMMM yyyy') : 'Recently';
 
   return (
-    <div className="space-y-6">
+    <div className="mx-auto max-w-2xl mt-8">
       {/* Profile Header */}
       <Card className="shadow-card border border-border">
         <CardContent className="p-6">
@@ -209,6 +209,7 @@ export default function ProfilePage() {
                   company: post.author.company || ''
                 }}
                 content={post.content}
+                image_url={post.image}
                 timestamp={format(new Date(post.createdAt), 'PPp')}
                 likes={post.likes}
                 comments={post.comments}

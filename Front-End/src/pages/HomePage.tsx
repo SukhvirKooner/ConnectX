@@ -1,8 +1,22 @@
 import { PostComposer } from "@/components/posts/PostComposer";
 import { PostFeed } from "@/components/feed/PostFeed";
 import { RightSidebar } from "@/components/sidebar/RightSidebar";
+import { useEffect } from 'react';
+import { useAuthModal } from "@/context/AuthModalContext";
+import { useAuth } from "@/context/AuthContext";
 
 export default function HomePage() {
+  const { showAuthModal } = useAuthModal();
+  const { isAuthenticated } = useAuth();
+  
+  // Show auth modal with signup form when user first visits
+  useEffect(() => {
+    // Only show the modal if the user is not authenticated
+    if (!isAuthenticated) {
+      showAuthModal();
+    }
+  }, [isAuthenticated, showAuthModal]);
+
   return (
     <div className="flex min-h-screen bg-background">
       {/* Main Content */}

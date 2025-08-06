@@ -6,7 +6,7 @@ const Notification = require('../models/notificationModel');
 const { asyncHandler } = require('../middlewares/errorMiddleware');
 const { successResponse, errorResponse, notFoundResponse, forbiddenResponse } = require('../utils/responseUtils');
 const { paginate } = require('../utils/paginationUtils');
-const { processUploadedFile } = require('../utils/fileUtils');
+const { processUploadedFile, deleteFile } = require('../utils/fileUtils');
 
 /**
  * @desc    Get paginated posts feed
@@ -41,7 +41,8 @@ const createPost = asyncHandler(async (req, res) => {
   // Process image if uploaded
   let imageUrl = '';
   if (req.file) {
-    const fileInfo = processUploadedFile(req.file);
+    // Upload to Cloudinary
+    const fileInfo = await processUploadedFile(req.file, 'posts');
     imageUrl = fileInfo.url;
   }
 
@@ -111,7 +112,14 @@ const updatePost = asyncHandler(async (req, res) => {
 
   // Process new image if uploaded
   if (req.file) {
-    const fileInfo = processUploadedFile(req.file);
+    // Upload to Cloudinary
+    const fileInfo = await processUploadedFile(req.file, 'posts');
+    
+    // If post already has an image, delete the old one
+    if (post.image_url) {
+      await deleteFile(post.image_url);
+    }
+    
     post.image_url = fileInfo.url;
   }
 
@@ -142,8 +150,13 @@ const deletePost = asyncHandler(async (req, res) => {
     return forbiddenResponse(res, 'Not authorized to delete this post');
   }
 
+  // Delete post image from Cloudinary if it exists
+  if (post.image_url) {
+    await deleteFile(post.image_url);
+  }
+  
   // Delete post
-  await post.remove();
+  await post.deleteOne();
 
   // Delete associated likes and comments
   await PostLike.deleteMany({ post_id: postId });

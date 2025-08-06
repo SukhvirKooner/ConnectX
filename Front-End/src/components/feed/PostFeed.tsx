@@ -90,6 +90,7 @@ export function PostFeed() {
             company: post.user_id.company || ""
           }}
           content={post.content}
+          image_url={post.image_url}
           timestamp={post.createdAt ? format(new Date(post.createdAt), 'PPp') : "Recently"}
           likes={post.likes_count}
           comments={post.comments_count}

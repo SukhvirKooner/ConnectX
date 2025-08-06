@@ -1,42 +1,33 @@
 const fs = require('fs');
 const path = require('path');
+const { uploadToCloudinary, deleteFromCloudinary, getPublicIdFromUrl } = require('./cloudinaryUtils');
 
 /**
- * Get file URL based on file path
- * @param {String} filePath - Path to the file
+ * Get file URL from Cloudinary result
+ * @param {Object} cloudinaryResult - Result from Cloudinary upload
  * @returns {String} - Public URL for the file
  */
-const getFileUrl = (filePath) => {
-  if (!filePath) return '';
-  
-  // In a production environment, this would be a CDN or cloud storage URL
-  // For local development, we'll use a relative path
-  const baseUrl = process.env.BASE_URL || `http://localhost:${process.env.PORT || 5000}`;
-  
-  // Convert absolute path to relative path for URL
-  const uploadsDir = path.join(__dirname, '../../uploads');
-  const relativePath = filePath.replace(uploadsDir, '/uploads');
-  
-  return `${baseUrl}${relativePath}`;
+const getFileUrl = (cloudinaryResult) => {
+  if (!cloudinaryResult) return '';
+  return cloudinaryResult.secure_url;
 };
 
 /**
- * Delete file from the filesystem
- * @param {String} filePath - Path to the file to delete
- * @returns {Boolean} - Success status
+ * Delete a file from Cloudinary
+ * @param {String} fileUrl - Cloudinary URL of the file
+ * @returns {Boolean} - Whether the file was deleted successfully
  */
-const deleteFile = (filePath) => {
-  if (!filePath) return false;
+const deleteFile = async (fileUrl) => {
+  if (!fileUrl) return false;
   
   try {
-    // Check if file exists
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-      return true;
-    }
-    return false;
+    const publicId = getPublicIdFromUrl(fileUrl);
+    if (!publicId) return false;
+    
+    const result = await deleteFromCloudinary(publicId);
+    return result && result.result === 'ok';
   } catch (error) {
-    console.error('Error deleting file:', error);
+    console.error(`Error deleting file ${fileUrl}:`, error);
     return false;
   }
 };
@@ -59,21 +50,32 @@ const createDirIfNotExists = (dirPath) => {
 };
 
 /**
- * Process uploaded file and return file info
+ * Process uploaded file and upload to Cloudinary
  * @param {Object} file - Multer file object
- * @returns {Object} - File information including URL
+ * @param {String} folder - Cloudinary folder to upload to
+ * @returns {Promise<Object>} - File information including Cloudinary URL
  */
-const processUploadedFile = (file) => {
+const processUploadedFile = async (file, folder = 'posts') => {
   if (!file) return null;
   
-  return {
-    filename: file.filename,
-    originalname: file.originalname,
-    mimetype: file.mimetype,
-    size: file.size,
-    path: file.path,
-    url: getFileUrl(file.path)
-  };
+  try {
+    // Upload file to Cloudinary
+    const cloudinaryResult = await uploadToCloudinary(file, folder);
+    
+    return {
+      originalname: file.originalname,
+      mimetype: file.mimetype,
+      size: file.size,
+      public_id: cloudinaryResult.public_id,
+      url: cloudinaryResult.secure_url,
+      width: cloudinaryResult.width,
+      height: cloudinaryResult.height,
+      format: cloudinaryResult.format
+    };
+  } catch (error) {
+    console.error('Error uploading file to Cloudinary:', error);
+    throw new Error('Failed to upload file to Cloudinary');
+  }
 };
 
 module.exports = {

@@ -13,6 +13,7 @@ const savedPosts = [
       company: "Microsoft"
     },
     content: "Just launched our new feature! It took months of planning and collaboration, but seeing it come to life makes it all worth it. Huge thanks to the entire team! 🎉",
+    image_url: "/placeholder-post-image.jpg",
     timestamp: "1 day ago",
     likes: 127,
     comments: 23,
@@ -26,6 +27,7 @@ const savedPosts = [
       company: "Airbnb"
     },
     content: "Design thinking isn't just about making things look pretty. It's about understanding user needs and creating solutions that truly make a difference. #UXDesign #ProductDesign",
+    image_url: null,
     timestamp: "3 days ago",
     likes: 89,
     comments: 12,

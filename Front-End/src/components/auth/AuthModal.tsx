@@ -10,7 +10,8 @@ interface AuthModalProps {
 }
 
 export function AuthModal({ isOpen, onClose }: AuthModalProps) {
-  const [isRegister, setIsRegister] = useState(false);
+  // Set isRegister to true by default to show signup form first
+  const [isRegister, setIsRegister] = useState(true);
   const { isAuthenticated, user } = useAuth();
 
   if (isAuthenticated && user?.profile_completed) {

@@ -164,9 +164,14 @@ module.exports.authSchema = {
 module.exports.userSchema = schemas.updateUser;
 module.exports.postSchema = {
   create: schemas.createPost,
-  update: schemas.updatePost
+  update: schemas.updatePost,
+  share: z.object({
+    content: z.string().optional()
+  })
 };
-module.exports.commentSchema = schemas.createComment;
+module.exports.commentSchema = {
+  create: schemas.createComment
+};
 module.exports.connectionSchema = schemas.createConnection;
 module.exports.jobSchema = schemas.createJob;
 module.exports.jobApplicationSchema = schemas.createJobApplication;

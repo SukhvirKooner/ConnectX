@@ -18,7 +18,7 @@ export function AppLayout({ children }: AppLayoutProps) {
             <div className="flex items-center px-4">
               <SidebarTrigger className="transition-smooth" />
               <div className="ml-4">
-                <h1 className="text-lg font-semibold text-foreground">Professional Network</h1>
+                <h1 className="text-lg font-semibold text-foreground">For You</h1>
               </div>
             </div>
           </header>

@@ -3,7 +3,7 @@ const Connection = require('../models/connectionModel');
 const Post = require('../models/postModel');
 const { asyncHandler } = require('../middlewares/errorMiddleware');
 const { successResponse, errorResponse, notFoundResponse } = require('../utils/responseUtils');
-const { processUploadedFile } = require('../utils/fileUtils');
+const { processUploadedFile, deleteFile } = require('../utils/fileUtils');
 const { paginate } = require('../utils/paginationUtils');
 
 /**
@@ -170,11 +170,17 @@ const uploadAvatar = asyncHandler(async (req, res) => {
     return errorResponse(res, 400, 'Please upload an image file');
   }
 
-  // Process uploaded file
-  const fileInfo = processUploadedFile(req.file);
+  // Process uploaded file and upload to Cloudinary
+  const fileInfo = await processUploadedFile(req.file, 'avatars');
 
   // Update user's avatar_url
   const user = await User.findById(req.user._id);
+  
+  // Delete old avatar from Cloudinary if it exists
+  if (user.avatar_url) {
+    await deleteFile(user.avatar_url);
+  }
+  
   user.avatar_url = fileInfo.url;
   await user.save();
 

@@ -7,6 +7,10 @@ import { Image, Smile, MapPin, Calendar, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useCreatePost } from "@/hooks/use-posts-api";
 import { useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/context/AuthContext";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import Picker from '@emoji-mart/react';
+import data from '@emoji-mart/data';
 
 interface CreatePostData {
   content: string;
@@ -20,11 +24,12 @@ export function PostComposer() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   
   // Use the create post mutation hook
   const createPostMutation = useCreatePost();
-  const { mutate: createPost } = createPostMutation;
-  const isLoading = createPostMutation.isLoading;
+  const { mutate: createPost, status } = createPostMutation;
+  const isLoading = status === 'pending';
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -96,9 +101,9 @@ export function PostComposer() {
       <CardContent className="p-4">
         <div className="flex gap-3">
           <Avatar className="h-12 w-12">
-            <AvatarImage src="/placeholder-avatar.jpg" alt="Your avatar" />
+            <AvatarImage src={user?.avatar_url} alt={user?.name || "Your avatar"} />
             <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
-              YN
+              {user?.name ? user.name.split(' ').map(n => n[0]).join('') : 'U'}
             </AvatarFallback>
           </Avatar>
           
@@ -107,7 +112,7 @@ export function PostComposer() {
               placeholder="What's on your mind? Share your thoughts with your professional network..."
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              className="min-h-[120px] resize-none border-0 p-0 text-base placeholder:text-muted-foreground focus-visible:ring-0 bg-transparent"
+              className="min-h-[120px] resize-none border-0 pr-4 text-base placeholder:text-muted-foreground focus-visible:ring-0 bg-transparent"
               disabled={isLoading}
             />
             
@@ -152,21 +157,29 @@ export function PostComposer() {
                   <Image className="h-4 w-4 mr-1" />
                   Photo
                 </Button>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="text-muted-foreground hover:text-foreground hover:bg-accent transition-smooth"
-                  onClick={() => {
-                    const moods = ['😊 Happy', '🎉 Excited', '💭 Thoughtful', '🔥 Motivated', '😌 Grateful'];
-                    const randomMood = moods[Math.floor(Math.random() * moods.length)];
-                    setContent(prev => prev + ` ${randomMood}`);
-                    toast({ title: "Mood added", description: `Added mood: ${randomMood}` });
-                  }}
-                >
-                  <Smile className="h-4 w-4 mr-1" />
-                  Mood
-                </Button>
-                <Button 
+                {/* Mood Button with Emoji-mart Picker Popover */}
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-muted-foreground hover:text-foreground hover:bg-accent transition-smooth"
+                    >
+                      <Smile className="h-4 w-4 mr-1" />
+                      Mood
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-72 h-80 overflow-y-auto p-0">
+                    <Picker
+                      data={data}
+                      onEmojiSelect={(emoji: any) => {
+                        setContent(prev => prev + ' ' + (emoji.native || ''));
+                      }}
+                      theme="auto"
+                    />
+                  </PopoverContent>
+                </Popover>
+                {/* <Button 
                   variant="ghost" 
                   size="sm" 
                   className="text-muted-foreground hover:text-foreground hover:bg-accent transition-smooth"
@@ -190,7 +203,7 @@ export function PostComposer() {
                 >
                   <MapPin className="h-4 w-4 mr-1" />
                   Location
-                </Button>
+                </Button> */}
                 <Button 
                   variant="ghost" 
                   size="sm" 

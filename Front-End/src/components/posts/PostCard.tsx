@@ -1,9 +1,9 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import { 
   Heart, 
   MessageCircle, 
@@ -11,10 +11,11 @@ import {
   Bookmark, 
   MoreHorizontal,
   ThumbsUp
-} from "lucide-react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { postService } from "@/services";
-import { useToast } from "@/hooks/use-toast";
+} from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { postService } from '@/services';
+import { useToast } from '@/hooks/use-toast';
+import { CommentSection } from './CommentSection';
 
 interface PostCardProps {
   author: {
@@ -25,18 +26,36 @@ interface PostCardProps {
   };
   content: string;
   timestamp: string;
+  image_url?: string;
   likes: number;
   comments: number;
   shares: number;
 }
 
-export function PostCard({ author, content, timestamp, likes, comments, shares, id }: PostCardProps & { id?: string }) {
+export function PostCard({ author, content, timestamp, image_url, likes, comments, shares, id }: PostCardProps & { id?: string }) {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isLiked, setIsLiked] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [likesCount, setLikesCount] = useState(likes);
   const [isLoading, setIsLoading] = useState(false);
+  const [showComments, setShowComments] = useState(false);
+  
+  // Fetch post details including liked status when component mounts
+  useEffect(() => {
+    const fetchPostDetails = async () => {
+      if (id) {
+        try {
+          const postData = await postService.getPostById(id);
+          setIsLiked(postData.isLiked);
+        } catch (error) {
+          console.error('Error fetching post details:', error);
+        }
+      }
+    };
+    
+    fetchPostDetails();
+  }, [id]);
 
   const handleLike = async () => {
     if (!id) {
@@ -48,10 +67,19 @@ export function PostCard({ author, content, timestamp, likes, comments, shares, 
     
     try {
       setIsLoading(true);
+      // Optimistically update UI
+      setIsLiked(!isLiked);
+      setLikesCount(prev => isLiked ? prev - 1 : prev + 1);
+      
+      // Then make the API call
       const response = await postService.toggleLike(id);
-      setIsLiked(response.liked);
+      // Update with actual server response
+      setIsLiked(response.isLiked);
       setLikesCount(response.likesCount);
     } catch (error) {
+      // Revert optimistic update on error
+      setIsLiked(!isLiked);
+      setLikesCount(prev => isLiked ? prev + 1 : prev - 1);
       console.error('Error toggling like:', error);
       toast({
         title: "Error",
@@ -116,6 +144,17 @@ export function PostCard({ author, content, timestamp, likes, comments, shares, 
           <p className="text-foreground leading-relaxed whitespace-pre-wrap">
             {content}
           </p>
+          
+          {/* Post Image */}
+          {image_url && (
+            <div className="mt-3 rounded-md overflow-hidden">
+              <img 
+                src={image_url} 
+                alt="Post image" 
+                className="max-w-full object-contain bg-accent/20 rounded-md" 
+              />
+            </div>
+          )}
         </div>
 
         {/* Engagement Stats */}
@@ -149,10 +188,7 @@ export function PostCard({ author, content, timestamp, likes, comments, shares, 
               variant="ghost" 
               size="sm" 
               className="text-muted-foreground hover:text-primary hover:bg-primary/10 transition-smooth"
-              onClick={() => {
-                // TODO: Implement comment functionality
-                console.log("Comment clicked");
-              }}
+              onClick={() => setShowComments(!showComments)}
             >
               <MessageCircle className="h-4 w-4 mr-2" />
               Comment
@@ -183,6 +219,9 @@ export function PostCard({ author, content, timestamp, likes, comments, shares, 
             <Bookmark className={`h-4 w-4 ${isSaved ? 'fill-current' : ''}`} />
           </Button>
         </div>
+        
+        {/* Comment Section */}
+         {id && <CommentSection postId={id} isOpen={showComments} />}
       </CardContent>
     </Card>
   );

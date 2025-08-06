@@ -26,13 +26,14 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/context/AuthContext";
 import { useAuthModal } from "@/context/AuthModalContext";
+import { FiHexagon } from 'react-icons/fi';
 
 const mainNavItems = [
   { title: "Home", url: "/", icon: Home },
   { title: "My Network", url: "/network", icon: Users },
   { title: "Jobs", url: "/jobs", icon: Briefcase },
-  { title: "Messaging", url: "/messages", icon: MessageSquare },
-  { title: "Notifications", url: "/notifications", icon: Bell, badge: "20+" },
+  // { title: "Messaging", url: "/messages", icon: MessageSquare },
+  // { title: "Notifications", url: "/notifications", icon: Bell, badge: "20+" },
   { title: "Search", url: "/search", icon: Search },
 ];
 
@@ -64,6 +65,13 @@ export function AppSidebar() {
   return (
     <Sidebar className="border-r border-border transition-smooth" collapsible="icon">
       <SidebarContent className="p-4">
+        {/* ConnectX Logo and Name */}
+        <div className={`flex items-center ${isCollapsed ? 'justify-center mb-8' : 'gap-2 mb-6 px-2'}`}>
+          <FiHexagon className="h-8 w-8 text-primary" />
+          {!isCollapsed && (
+            <span className="font-bold text-xl tracking-tight text-primary">ConnectX</span>
+          )}
+        </div>
         {/* Main Navigation */}
         <SidebarGroup>
           <SidebarGroupLabel className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
