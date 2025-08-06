@@ -88,10 +88,6 @@ npm run preview
 │       └── ...                    # Other services
 ```
 
-## API Integration
-
-The frontend connects to the backend API at `http://localhost:5001`. See [API_INTEGRATION.md](./API_INTEGRATION.md) for detailed documentation.
-
 ### Authentication Flow
 
 1. User registers or logs in
