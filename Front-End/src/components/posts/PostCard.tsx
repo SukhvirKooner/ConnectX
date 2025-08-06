@@ -10,12 +10,15 @@ import {
   Share2, 
   Bookmark, 
   MoreHorizontal,
-  ThumbsUp
+  ThumbsUp,
+  Trash2
 } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { postService } from '@/services';
 import { useToast } from '@/hooks/use-toast';
 import { CommentSection } from './CommentSection';
+import { useDeletePost } from '@/hooks/use-posts-api';
+import { useAuth } from '@/context/AuthContext';
 
 interface PostCardProps {
   author: {
@@ -32,14 +35,22 @@ interface PostCardProps {
   shares: number;
 }
 
-export function PostCard({ author, content, timestamp, image_url, likes, comments, shares, id }: PostCardProps & { id?: string }) {
+export function PostCard({ author, content, timestamp, image_url, likes, comments, shares, id, user_id }: PostCardProps & { id?: string, user_id?: string }) {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
   const [isLiked, setIsLiked] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [likesCount, setLikesCount] = useState(likes);
   const [isLoading, setIsLoading] = useState(false);
   const [showComments, setShowComments] = useState(false);
+  
+  // Check if current user is the author of the post
+  const isAuthor = user?._id === user_id;
+  
+  // Use the delete post mutation hook
+  const deletePostMutation = useDeletePost();
+  const { mutate: deletePost, status: deleteStatus } = deletePostMutation;
   
   // Fetch post details including liked status when component mounts
   useEffect(() => {
@@ -133,8 +144,38 @@ export function PostCard({ author, content, timestamp, image_url, likes, comment
             <DropdownMenuContent align="end" className="w-48">
               <DropdownMenuItem>Save post</DropdownMenuItem>
               <DropdownMenuItem>Copy link</DropdownMenuItem>
-              <DropdownMenuItem>Hide this post</DropdownMenuItem>
-              <DropdownMenuItem className="text-destructive">Report post</DropdownMenuItem>
+              {isAuthor ? (
+                <DropdownMenuItem 
+                  className="text-destructive flex items-center gap-2"
+                  onClick={() => {
+                    if (!id) return;
+                    
+                    if (window.confirm('Are you sure you want to delete this post? This action cannot be undone.')) {
+                      deletePost(id, {
+                        onSuccess: () => {
+                          toast({
+                            title: "Post deleted",
+                            description: "Your post has been successfully deleted."
+                          });
+                        },
+                        onError: (error) => {
+                          console.error('Error deleting post:', error);
+                          toast({
+                            title: "Error",
+                            description: "Failed to delete post. Please try again.",
+                            variant: "destructive"
+                          });
+                        }
+                      });
+                    }
+                  }}
+                >
+                  <Trash2 className="h-4 w-4" />
+                  Delete post
+                </DropdownMenuItem>
+              ) : (
+                <DropdownMenuItem className="text-destructive">Report post</DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

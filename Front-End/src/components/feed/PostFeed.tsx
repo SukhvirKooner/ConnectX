@@ -4,6 +4,7 @@ import { usePosts } from "@/hooks/use-posts-api";
 import { format } from "date-fns";
 
 interface PostAuthor {
+  _id: string;
   name: string;
   avatar_url?: string;
   title?: string;
@@ -41,7 +42,7 @@ export function PostFeed() {
   const [limit] = useState(10);
   
   // Fetch posts from the API
-  const { data , isLoading, isError } = usePosts<PostsResponse>({ page, limit });
+  const { data: postsData, isLoading, isError } = usePosts<PostsResponse>({ page, limit });
   
   // Handle loading state
   if (isLoading) {
@@ -67,7 +68,7 @@ export function PostFeed() {
   }
   
   // If no posts are available
-  if (!data || !data.data || data.data.length === 0) {
+  if (!postsData || !postsData.data || postsData.data.length === 0) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
@@ -79,10 +80,11 @@ export function PostFeed() {
   
   return (
     <div className="space-y-6">
-      {data.data.map((post: Post) => (
+      {postsData.data.map((post: Post) => (
         <PostCard
           key={post._id}
           id={post._id}
+          user_id={post.user_id._id}
           author={{
             name: post.user_id.name,
             avatar: post.user_id.avatar_url,
@@ -99,7 +101,7 @@ export function PostFeed() {
       ))}
       
       {/* Pagination controls */}
-      {data.pagination && data.pagination.hasMore && (
+      {postsData.pagination && postsData.pagination.hasMore && (
         <div className="flex justify-center mt-6">
           <button
             onClick={() => setPage(page + 1)}
