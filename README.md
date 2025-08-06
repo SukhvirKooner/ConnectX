@@ -15,7 +15,7 @@ ConnectX is a modern professional networking platform designed to connect profes
 - **Messaging**: Communicate with connections
 - **Search Functionality**: Find users, posts, and jobs
   
-##Demo Credentials
+## Demo Credentials
 Use the following credentials to test the platform:
 
 - Email: sukhvir@gmail.com
