@@ -377,6 +377,34 @@ const sharePost = asyncHandler(async (req, res) => {
   return successResponse(res, 201, 'Post shared successfully', sharedPost);
 });
 
+/**
+ * @desc    Get posts by user ID
+ * @route   GET /api/posts/user/:userId
+ * @access  Private
+ */
+const getPostsByUserId = asyncHandler(async (req, res) => {
+  const userId = req.params.userId;
+  const { page = 1, limit = 10 } = req.query;
+
+  // Verify user exists
+  const user = await User.findById(userId);
+  if (!user) {
+    return notFoundResponse(res, 'User not found');
+  }
+
+  // Get paginated results for user's posts
+  const options = {
+    sort: { createdAt: -1 },
+    populate: [
+      { path: 'user_id', select: 'name avatar_url title' }
+    ]
+  };
+
+  const results = await paginate(Post, { user_id: userId }, page, limit, options);
+
+  return successResponse(res, 200, 'User posts retrieved successfully', results);
+});
+
 module.exports = {
   getPosts,
   createPost,
@@ -387,5 +415,6 @@ module.exports = {
   getPostLikes,
   addComment,
   getPostComments,
-  sharePost
+  sharePost,
+  getPostsByUserId
 };

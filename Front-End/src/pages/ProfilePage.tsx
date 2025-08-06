@@ -58,11 +58,9 @@ export default function ProfilePage() {
         const skillsResponse = await skillService.getUserSkills(currentUser._id);
         setUserSkills(skillsResponse?.items || []);
         
-        // Fetch user posts
-        const postsResponse = await postService.getPosts({ limit: 5 });
-        // Filter posts by the current user
-        const userPosts = postsResponse?.items?.filter((post: Post) => post.author.id === currentUser._id) || [];
-        setUserPosts(userPosts);
+        // Fetch user posts directly using the new API endpoint
+        const postsResponse = await postService.getPostsByUserId(currentUser._id, { limit: 5 });
+        setUserPosts(postsResponse?.items || []);
       } catch (err) {
         console.error("Error fetching profile data:", err);
         setError("Failed to load profile data. Please try again later.");

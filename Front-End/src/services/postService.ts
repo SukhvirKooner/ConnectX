@@ -30,6 +30,12 @@ const postService = {
     return response.data.data;
   },
   
+  // Get posts by user ID
+  getPostsByUserId: async (userId: string, params: PostParams = {}): Promise<any> => {
+    const response = await api.get(`/api/posts/user/${userId}`, { params });
+    return response.data.data;
+  },
+  
   // Create a new post
   createPost: async (data: CreatePostData): Promise<any> => {
     const formData = new FormData();

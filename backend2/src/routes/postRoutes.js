@@ -9,7 +9,8 @@ const {
   getPostLikes,
   addComment,
   getPostComments,
-  sharePost
+  sharePost,
+  getPostsByUserId
 } = require('../controllers/postController');
 const { protect, isOwner } = require('../middlewares/authMiddleware');
 const { validate, postSchema, commentSchema, paginationSchema } = require('../middlewares/validationMiddleware');
@@ -39,5 +40,8 @@ router.get('/:id/comments', validate(paginationSchema), getPostComments);
 
 // Post share route
 router.post('/:id/share', validate(postSchema.share), sharePost);
+
+// Get posts by user ID
+router.get('/user/:userId', validate(paginationSchema), getPostsByUserId);
 
 module.exports = router;

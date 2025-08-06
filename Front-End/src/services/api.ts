@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { getAccessToken, getRefreshToken, setTokens, clearTokens } from './auth.ts';
 
-const API_URL = 'http://localhost:5001';
+const API_URL = 'https://connectx-backend-1ybq.onrender.com';
 
 const api = axios.create({
   baseURL: API_URL,
