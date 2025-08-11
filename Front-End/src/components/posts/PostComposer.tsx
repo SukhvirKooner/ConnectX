@@ -97,26 +97,23 @@ export function PostComposer() {
   };
 
   return (
-    <Card className="shadow-card border border-border">
+    <Card className="shadow-card border border-border w-full max-w-2xl mx-auto md:rounded-lg md:my-6 md:px-0 px-2 py-2">
       <CardContent className="p-4">
-        <div className="flex gap-3">
-          <Avatar className="h-12 w-12">
+        <div className="flex gap-3 flex-col sm:flex-row">
+          <Avatar className="h-12 w-12 mx-auto sm:mx-0">
             <AvatarImage src={user?.avatar_url} alt={user?.name || "Your avatar"} />
             <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
               {user?.name ? user.name.split(' ').map(n => n[0]).join('') : 'U'}
             </AvatarFallback>
           </Avatar>
-          
-          <div className="flex-1">
+          <div className="flex-1 w-full">
             <Textarea
               placeholder="What's on your mind? Share your thoughts with your professional network..."
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              className="min-h-[120px] resize-none border-0 pr-4 text-base placeholder:text-muted-foreground focus-visible:ring-0 bg-transparent"
+              className="min-h-[100px] resize-none border-0 pr-4 text-base placeholder:text-muted-foreground focus-visible:ring-0 bg-transparent w-full"
               disabled={isLoading}
             />
-            
-            {/* Image preview */}
             {imagePreview && (
               <div className="relative mt-3 rounded-md overflow-hidden">
                 <img 
@@ -134,8 +131,6 @@ export function PostComposer() {
                 </Button>
               </div>
             )}
-            
-            {/* Hidden file input */}
             <input
               type="file"
               ref={fileInputRef}
@@ -144,9 +139,8 @@ export function PostComposer() {
               className="hidden"
               disabled={isLoading}
             />
-            
-            <div className="flex items-center justify-between mt-4 pt-4 border-t border-border">
-              <div className="flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row items-center justify-between mt-4 pt-4 border-t border-border gap-2">
+              <div className="flex items-center gap-2 w-full sm:w-auto flex-wrap">
                 <Button 
                   variant="ghost" 
                   size="sm" 
@@ -157,7 +151,6 @@ export function PostComposer() {
                   <Image className="h-4 w-4 mr-1" />
                   Photo
                 </Button>
-                {/* Mood Button with Emoji-mart Picker Popover */}
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
@@ -179,31 +172,6 @@ export function PostComposer() {
                     />
                   </PopoverContent>
                 </Popover>
-                {/* <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="text-muted-foreground hover:text-foreground hover:bg-accent transition-smooth"
-                  onClick={() => {
-                    if (navigator.geolocation) {
-                      navigator.geolocation.getCurrentPosition(
-                        (position) => {
-                          toast({ 
-                            title: "Location added", 
-                            description: `Coordinates: ${position.coords.latitude.toFixed(2)}, ${position.coords.longitude.toFixed(2)}` 
-                          });
-                        },
-                        () => {
-                          toast({ title: "Location access denied", description: "Please enable location access to add your location." });
-                        }
-                      );
-                    } else {
-                      toast({ title: "Location unavailable", description: "Geolocation is not supported by this browser." });
-                    }
-                  }}
-                >
-                  <MapPin className="h-4 w-4 mr-1" />
-                  Location
-                </Button> */}
                 <Button 
                   variant="ghost" 
                   size="sm" 
@@ -219,11 +187,10 @@ export function PostComposer() {
                   Event
                 </Button>
               </div>
-              
               <Button 
                 onClick={handlePost}
                 disabled={!content.trim() || isLoading}
-                className="bg-primary hover:bg-primary-hover text-primary-foreground font-medium px-6 transition-smooth shadow-elegant disabled:shadow-none disabled:opacity-50"
+                className="bg-primary hover:bg-primary-hover text-primary-foreground font-medium px-6 transition-smooth shadow-elegant disabled:shadow-none disabled:opacity-50 w-full sm:w-auto"
               >
                 {isLoading ? (
                   <>
